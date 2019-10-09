@@ -1,0 +1,307 @@
+#include<stdio.h>
+#define max 20
+char stack[20];
+int estack[20];
+int tops=-1,tope=-1;
+void push(char x[],char a,int *top)
+{
+	(*top)++;
+	if(*top>=max)
+		printf("\nStack Overflow");
+	else
+	{
+		printf("\nPushed %c",a);
+		x[(*top)]=a;
+	}
+}
+char pop(char x[],int *top)
+{
+	char c;
+	if(*top!=-1)
+	{
+		c=x[*top];
+		(*top)--;
+		printf("\nPopped %c",c);
+		return c;
+	}
+	else
+	{
+		printf("\nStack Empty");
+	}
+}
+void ipush(int x[],int a,int *top)
+{
+	(*top)++;
+	if(*top>=max)
+		printf("\nStack Overflow");
+	else
+	{
+		printf("\nPushed %d",a);
+		x[(*top)]=a;
+	}
+}
+int ipop(int x[],int *top)
+{
+	int c;
+	if(*top!=-1)
+	{
+		c=x[*top];
+		(*top)--;
+		printf("\nPopped %d",c);
+		return c;
+	}
+	else
+	{
+		printf("\nStack Empty");
+	}
+}
+
+char stacktop(char x[],int *top)
+{
+	char c;
+	if((*top)!=-1)
+	{
+		c=pop(x,top);
+		push(x,c,top);
+		return c;
+	}
+}
+void assign(char x[],int *top)
+{
+	int i=0;
+	while(x[i]!='\0')
+	{
+		push(x,x[i],top);
+		i++;
+	}
+	x[i]='\0';
+}
+char* getpost(char infix[])
+{
+	int i=0,ctr=0,j;
+	char c,d,e,post[20]={0};
+	while(infix[i]!='\0')
+	{
+		c=infix[i];
+		switch(c)
+		{
+			case '(':
+				push(stack,c,&tops);
+
+				break;
+			case '{':
+				push(stack,c,&tops);
+				
+				break;
+			case '[':
+				push(stack,c,&tops);
+				
+				break;
+				
+			case '+':
+				d=stacktop(stack,&tops);
+				while(d=='*' || d=='/' || d=='-' || d=='+')
+				{
+					e=pop(stack,&tops);
+					post[ctr]=e;
+					ctr++;
+					d=stacktop(stack,&tops);
+				}
+				push(stack,c,&tops);
+					
+				break;
+			case '-':
+				d=stacktop(stack,&tops);
+				while(d=='*' || d=='/' || d=='+'|| d=='-')
+				{
+					e=pop(stack,&tops);
+					post[ctr]=e;
+					ctr++;
+					d=stacktop(stack,&tops);
+				}
+				push(stack,c,&tops);
+				
+				break;
+			case '*':
+				d=stacktop(stack,&tops);
+				while(d=='/' || d=='*' )
+				{
+					e=pop(stack,&tops);
+					post[ctr]=e;
+					ctr++;
+					d=stacktop(stack,&tops);
+				}
+				push(stack,c,&tops);
+				
+				break;
+			case '/':
+				d=stacktop(stack,&tops);
+				while(d=='*' || d=='/' )
+				{
+					e=pop(stack,&tops);
+					post[ctr]=e;
+					ctr++;
+					d=stacktop(stack,&tops);
+				}
+				push(stack,c,&tops);
+				
+				break;
+			case ')':
+				d=stacktop(stack,&tops);
+				while(d!='(')
+				{
+					e=pop(stack,&tops);
+					post[ctr]=e;
+					ctr++;
+					d=stacktop(stack,&tops);
+				}
+				e=pop(stack,&tops);
+				
+				break;
+			case '}':
+				d=stacktop(stack,&tops);
+				while(d!='{')
+				{
+					e=pop(stack,&tops);
+					post[ctr]=e;
+					ctr++;
+					d=stacktop(stack,&tops);
+				}
+				e=pop(stack,&tops);
+
+				break;
+			case ']':
+				d=stacktop(stack,&tops);
+				while(d!='[')
+				{
+					e=pop(stack,&tops);
+					post[ctr]=e;
+					ctr++;
+					d=stacktop(stack,&tops);
+				}
+				e=pop(stack,&tops);
+				
+				break;
+			default:
+				post[ctr]=c;
+				ctr++;
+				break;
+		}
+		printf("\nCurrent Postfix Expression is:%s\n",post);
+		i++;
+	}
+	
+	while(tops!=-1)
+	{
+		c=pop(stack,&tops);
+		post[ctr]=c;
+		ctr++;
+	}
+	post[ctr]='\0';
+	return post;
+}
+int calc(int o1,char op,int o2)
+{
+	switch(op)
+	{
+		case '+':
+			return o1+o2;
+			break;
+		case '-':
+			return o1-o2;
+			break;
+		case '*':
+			return o1*o2;
+			break;
+		case '/':
+			return o1/o2;
+			break;
+		default:
+			printf("\nError");
+			break;
+	}	
+}
+int evaluate(char post[])
+{
+	int i=0,t,t1;
+	char c;
+	while(post[i]!='\0')
+	{
+		c=post[i];
+		if(isalpha(c))
+		{
+			printf("\nEnter Value for %c:",c);
+			scanf("%d",&t);
+			ipush(estack,t,&tope);
+		}
+		else
+		{
+			t=ipop(estack,&tope);
+			t1=ipop(estack,&tope);
+			t=calc(t,c,t1);
+			ipush(estack,t,&tope);
+		}
+		i++;
+	}
+	return estack[0];	
+}
+void main()
+{
+	int y;
+	char *post,infix[20];
+	printf("Enter Infix Expression\n");
+	scanf("%s",infix);
+	post=getpost(infix);
+	printf("\nPostfix Expression is:%s\n",post);
+	y=evaluate(post);
+	printf("\nAnswer:%d",y);
+}
+OUTPUT:
+christine@christine-Inspiron-5558:~/Desktop$ ./a.out
+Enter Infix Expression
+a+(b*c)
+
+Current Postfix Expression is:a
+
+Pushed +
+Current Postfix Expression is:a
+
+Pushed (
+Current Postfix Expression is:a
+
+Current Postfix Expression is:ab
+
+Popped (
+Pushed (
+Pushed *
+Current Postfix Expression is:ab
+
+Current Postfix Expression is:abc
+
+Popped *
+Pushed *
+Popped *
+Popped (
+Pushed (
+Popped (
+Current Postfix Expression is:abc*
+
+Popped +
+Postfix Expression is:abc*+
+
+Enter Value for a:1
+
+Pushed 1
+Enter Value for b:2
+
+Pushed 2
+Enter Value for c:3
+
+Pushed 3
+Popped 3
+Popped 2
+Pushed 6
+Popped 6
+Popped 1
+Pushed 7
+Answer:7

@@ -1,0 +1,616 @@
+/*We Fly Anywhere Airlines (WFAA) is considering redesigning their ticket counters for airline passengers. They would like to have two separate waiting lines, one for regular customers and one for frequent flyers. Assuming there is only one ticket agent available to serve all passengers, they would like to determine the average waiting time for both types of passengers using various strategies for taking passengers from the waiting lines. WAP to simulate this situation.*/
+
+#include<stdio.h>
+#define max 20
+struct passenger
+{
+	char name[10];
+	int time;
+};
+typedef struct passenger p;
+int a[3][4];
+p q1[max],q2[max];
+int f1=0;
+int f2=0;
+int r1=-1;
+int r2=-1;
+void addq(p q[],p t,int *rear)
+{
+	(*rear)++;
+	if(*rear==max-1)
+	{
+		printf("Queue is Full!\n");
+	}
+	else
+	{
+		q[*rear]=t;
+		printf("Added\n");
+	}
+}	
+p *delq(p q[],int *front,int *rear)
+{
+	p *t;
+	if(*front-*rear==1)
+	{
+		printf("Queue is Empty\n");
+	}
+	else
+	{
+		t=&q[*front];
+		(*front)++;
+		return t;
+	}
+}
+void display(p q[],int rear,int t)
+{
+	int i;
+	for(i=0;i<=rear;i++)
+	{
+		if(t==1)
+		printf("Frequent\t%s\t%d\n",q[i].name,q[i].time);
+		else
+		printf("Normal\t%s\t%d\n",q[i].name,q[i].time);
+	}
+}
+void accept(int n1,int n2)
+{
+	int i;
+	p temp;
+	printf("Enter Details of Normal Passengers\n");
+	for(i=0;i<n1;i++)
+	{
+		printf("Enter Name of Passenger %d:\n",i+1);
+		scanf("%s",temp.name);
+		temp.time=0;
+		addq(q1,temp,&r1);
+	}
+	printf("Enter Details of Frequent Passengers\n");
+	for(i=0;i<n2;i++)
+	{
+		printf("Enter Name of Passenger %d:\n",i+1);
+		scanf("%s",temp.name);
+		temp.time=0;
+		addq(q2,temp,&r2);
+	}
+	printf("Normal Passenger Queue:\n");
+	printf("Type\tName\tWaiting Time\n");
+	display(q1,r1,0);
+	printf("Frequent Passenger Queue:\n");
+	printf("Type\t\tName\tWaiting Time\n");
+	display(q2,r2,1);
+}
+void st1()
+{
+	int i,r2cp,r1cp;
+	p *t;
+	printf("\n-------------------------------------------------------\n");
+	printf("Strategy 1:\nRemoving all Passengers in Frequent Queue then Passengers in Normal Queue considering each passenger requires 1 min at the counter\n\n");
+	r2cp=r2;
+	r1cp=r1;
+	for(i=0;i<=r2;i++)
+	{
+		t=delq(q2,&f2,&r2);
+		printf("***At the Counter***\nPassenger %d:\nName:%s\nType:Frequent\n",i+1,(*t).name);
+		(*t).time=i;
+	}
+	for(i=0;i<=r1;i++)
+	{
+		t=delq(q1,&f1,&r1);
+		printf("At the Counter\nPassenger %d:\nName:%s\nType:Normal\n",i+1,(*t).name);
+		(*t).time=r2+i+1;
+	}
+	a[0][0]=q1[r1cp].time;
+	a[0][1]=q2[r2cp].time;
+	a[0][2]=a[0][0]+a[0][1];
+	a[0][3]=a[0][2]/2;
+	printf("\n------------Final Report by Strategy-1----------------\n");
+	printf("Normal Passenger Queue:\n");
+	printf("Type\tName\tWaiting Time\n");
+	display(q1,r1,0);
+	printf("Frequent Passenger Queue:\n");
+	printf("Type\t\tName\tWaiting Time\n");
+	display(q2,r2,1);
+	printf("\n------------------------------------------------------\n");
+}
+void st2()
+{
+	int i=0,j=0,r1cp,r2cp;
+	p *t;
+	printf("\n------------------------------------------------------\n");
+	printf("Strategy 2:\nRemoving  Passengers in Frequent Queue and Normal Queue alternately considering each passenger requires 1 min at the counter\n\n");
+	r1cp=r1;
+	r2cp=r2;
+	while(i<=r1+1 && j<=r2)
+	{
+		if((i+j)%2==0)
+		{
+			t=delq(q2,&f2,&r2);
+			printf("***At the Counter***\nPassenger %d:\nName:%s\nType:Frequent\n",i+1,(*t).name);
+			(*t).time=i+j;
+			i++;
+		}
+		else
+		{
+			t=delq(q1,&f1,&r1);
+			printf("***At the Counter***\nPassenger %d:\nName:%s\nType:Normal\n",j+1,(*t).name);
+			(*t).time=i+j;
+			j++;
+		}
+	}
+	while(i<=r2)
+	{
+		t=delq(q2,&f2,&r2);
+		printf("***At the Counter***\nPassenger %d:\nName:%s\nType:Frequent\n",i+1,(*t).name);
+		(*t).time=i+j;
+		i++;
+	}
+	while(j<=r1)
+	{
+		t=delq(q1,&f1,&r1);
+		printf("***At the Counter***\nPassenger %d:\nName:%s\nType:Frequent\n",i+1,(*t).name);
+		(*t).time=j+i;
+		j++;
+	}
+	a[1][0]=q1[r1cp].time;
+	a[1][1]=q2[r2cp].time;
+	a[1][2]=a[1][0]+a[1][1];
+	a[1][3]=a[1][2]/2;
+	printf("\n------------Final Report by Strategy-2----------------\n");
+	printf("Normal Passenger Queue:\n");
+	printf("Type\tName\tWaiting Time\n");
+	display(q1,r1,0);
+	printf("Frequent Passenger Queue:\n");
+	printf("Type\t\tName\tWaiting Time\n");
+	display(q2,r2,1);
+	printf("\n------------------------------------------------------\n");
+}
+void st3()
+{
+	int i=0,j=0,ctr=0,r,time=0,r1cp,r2cp;
+	p *t;
+	printf("\n------------------------------------------------------\n");
+	printf("Strategy 3:\nRemoving  Passengers in Frequent Queue and Normal Queue according to ratio considering each passenger requires 1 min at the counter\n\n");
+	r=(r2+1)/(r1+1);
+	r1cp=r1;
+	r2cp=r2;
+	printf("Ratio:%d\n",r);
+	if(r>1)
+	{
+		while(j<=r1)
+		{
+			if(ctr%2==0)
+			{
+				for(i=0;i<r;i++)
+				{
+					t=delq(q2,&f2,&r2);
+					printf("***At the Counter***\nPassenger %d:\nName:%s\nType:Frequent\n",time+1,(*t).name);
+					(*t).time=time;
+					time++;
+				}
+				ctr++;
+			}
+			else
+			{
+				t=delq(q1,&f1,&r1);
+				printf("***At the Counter***\nPassenger %d:\nName:%s\nType:Frequent\n",time+1,(*t).name);
+				(*t).time=time;
+				time++;
+				j++;
+				ctr++;
+			}
+		}	
+	}
+	else if(r<1)
+	{
+		while(j<=r2)
+		{
+			if(j%2==0)
+			{
+				t=delq(q2,&f2,&r2);
+				printf("***At the Counter***\nPassenger %d:\nName:%s\nType:Frequent\n",time+1,(*t).name);
+				(*t).time=time;
+				time++;
+				j++;
+			}
+			else
+			{
+				for(i=0;i<=r;i++)
+				{
+					t=delq(q1,&f1,&r1);
+					printf("***At the Counter***\nPassenger %d:\nName:%s\nType:Normal\n",time+1,(*t).name);
+					(*t).time=time;
+					time++;
+					t=delq(q1,&f1,&r1);
+				}
+			}
+		}
+	}
+	else
+	{
+		while(i<=r1+1 && j<=r2)
+		{
+			if((i+j)%2==0)
+			{
+				t=delq(q2,&f2,&r2);
+				printf("***At the Counter***\nPassenger %d:\nName:%s\nType:Frequent\n",i+1,(*t).name);
+				(*t).time=i+j;
+				i++;
+			}
+			else
+			{
+				t=delq(q1,&f1,&r1);
+				printf("***At the Counter***\nPassenger %d:\nName:%s\nType:Normal\n",j+1,(*t).name);
+				(*t).time=i+j;
+				j++;
+			}
+		}
+		while(i<=r2)
+		{
+			t=delq(q2,&f2,&r2);
+			printf("***At the Counter***\nPassenger %d:\nName:%s\nType:Frequent\n",i+1,(*t).name);
+			(*t).time=i+j;
+			i++;
+		}
+		while(j<=r1)
+		{
+			t=delq(q1,&f1,&r1);
+			printf("***At the Counter***\nPassenger %d:\nName:%s\nType:Frequent\n",i+1,(*t).name);
+			(*t).time=j+i;
+			j++;
+		}
+	}
+	a[2][0]=q1[r1cp].time;
+	a[2][1]=q2[r2cp].time;
+	a[2][2]=a[2][0]+a[2][1];
+	a[2][3]=a[2][2]/2;
+	printf("\n------------Final Report by Strategy-3---------------\n");
+	printf("Normal Passenger Queue:\n");
+	printf("Type\tName\tWaiting Time\n");
+	display(q1,r1,0);
+	printf("Frequent Passenger Queue:\n");
+	printf("Type\t\tName\tWaiting Time\n");
+	display(q2,r2,1);
+	printf("\n------------------------------------------------------\n");
+}
+void eval()
+{
+	int min,i;
+	int mina[3],ctr=0;
+	int fr1=f1;
+	int fr2=f2;
+	int re1=r1;
+	int re2=r2;
+	st1();
+	f1=fr1;
+	f2=fr2;
+	r1=re1;
+	r2=re2;	
+	st2();
+	f1=fr1;
+	f2=fr2;
+	r1=re1;
+	r2=re2;		
+	st3();
+	min=a[0][3];
+	printf("\n--------------TOTAL EVALUATION----------------\n");
+	printf("Strategy\tT.Normal\tT.Frequent\tT.Time\tAvg.Time\n");
+	for(i=0;i<3;i++)
+	{
+		printf("\n%d\t\t%d\t\t%d\t\t%d\t\t%d",i+1,a[i][0],a[i][1],a[i][2],a[i][3]);
+	}
+	for(i=0;i<3;i++)
+	{
+		if(min>a[i][3])
+		min=a[i][3];
+	}
+	for(i=0;i<3;i++)
+	{
+		if(min==a[i][3])
+		{
+			mina[ctr]=i;
+			ctr++;
+		}
+	}
+	printf("\nStartegies which can be used for best result:\n");
+	for(i=0;i<ctr;i++)
+	printf("%d\n",mina[i]+1);
+}
+void simulate()
+{
+	int ch;
+	int fr1=f1;
+	int fr2=f2;
+	int re1=r1;
+	int re2=r2;
+	do
+	{
+		f1=fr1;
+		f2=fr2;
+		r1=re1;
+		r2=re2;
+		printf("\nExecute By:\n1.Strategy 1\n2.Strategy 2\n3.Strategy 3\n4.Evaluate\n5.Exit\n");
+		scanf("%d",&ch);
+		switch(ch)
+		{
+			case 1:
+				st1();
+				break;
+			case 2:
+				st2();
+				break;
+			case 3:
+				st3();
+				break;
+			case 4:
+				eval();
+				break;
+			case 5:
+				printf("Thankyou!");
+				break;
+			default:
+				printf("\nWrong Choice!\n");
+				break;
+		}
+	}while(ch!=5);
+}
+void main()
+{
+	int n1,n2;
+	printf("Enter no. of Normal Passengers\n");
+	scanf("%d",&n1);
+	printf("Enter no. of Frequent Passengers\n");
+	scanf("%d",&n2);
+	accept(n1,n2);
+	simulate();	
+}
+/*OUTPUT:
+amitabh@amitabh-Inspiron-7537:~$ cd Desktop
+amitabh@amitabh-Inspiron-7537:~/Desktop$ gcc ds4.c
+amitabh@amitabh-Inspiron-7537:~/Desktop$ ./a.out
+Enter no. of Normal Passengers
+4
+Enter no. of Frequent Passengers
+5
+Enter Details of Normal Passengers
+Enter Name of Passenger 1:
+a
+Added
+Enter Name of Passenger 2:
+b
+Added
+Enter Name of Passenger 3:
+c
+Added
+Enter Name of Passenger 4:
+d
+Added
+Enter Details of Frequent Passengers
+Enter Name of Passenger 1:
+e
+Added
+Enter Name of Passenger 2:
+f
+Added
+Enter Name of Passenger 3:
+g
+Added
+Enter Name of Passenger 4:
+h
+Added
+Enter Name of Passenger 5:
+i
+Added
+Normal Passenger Queue:
+Type	Name	Waiting Time
+Normal	a	0
+Normal	b	0
+Normal	c	0
+Normal	d	0
+Frequent Passenger Queue:
+Type		Name	Waiting Time
+Frequent	e	0
+Frequent	f	0
+Frequent	g	0
+Frequent	h	0
+Frequent	i	0
+
+Execute By:
+1.Strategy 1
+2.Strategy 2
+3.Strategy 3
+4.Evaluate
+5.Exit
+4
+
+-------------------------------------------------------
+Strategy 1:
+Removing all Passengers in Frequent Queue then Passengers in Normal Queue considering each passenger requires 1 min at the counter
+
+***At the Counter***
+Passenger 1:
+Name:e
+Type:Frequent
+***At the Counter***
+Passenger 2:
+Name:f
+Type:Frequent
+***At the Counter***
+Passenger 3:
+Name:g
+Type:Frequent
+***At the Counter***
+Passenger 4:
+Name:h
+Type:Frequent
+***At the Counter***
+Passenger 5:
+Name:i
+Type:Frequent
+At the Counter
+Passenger 1:
+Name:a
+Type:Normal
+At the Counter
+Passenger 2:
+Name:b
+Type:Normal
+At the Counter
+Passenger 3:
+Name:c
+Type:Normal
+At the Counter
+Passenger 4:
+Name:d
+Type:Normal
+
+------------Final Report by Strategy-1----------------
+Normal Passenger Queue:
+Type	Name	Waiting Time
+Normal	a	5
+Normal	b	6
+Normal	c	7
+Normal	d	8
+Frequent Passenger Queue:
+Type		Name	Waiting Time
+Frequent	e	0
+Frequent	f	1
+Frequent	g	2
+Frequent	h	3
+Frequent	i	4
+
+------------------------------------------------------
+
+------------------------------------------------------
+Strategy 2:
+Removing  Passengers in Frequent Queue and Normal Queue alternately considering each passenger requires 1 min at the counter
+
+***At the Counter***
+Passenger 1:
+Name:e
+Type:Frequent
+***At the Counter***
+Passenger 1:
+Name:a
+Type:Normal
+***At the Counter***
+Passenger 2:
+Name:f
+Type:Frequent
+***At the Counter***
+Passenger 2:
+Name:b
+Type:Normal
+***At the Counter***
+Passenger 3:
+Name:g
+Type:Frequent
+***At the Counter***
+Passenger 3:
+Name:c
+Type:Normal
+***At the Counter***
+Passenger 4:
+Name:h
+Type:Frequent
+***At the Counter***
+Passenger 4:
+Name:d
+Type:Normal
+***At the Counter***
+Passenger 5:
+Name:i
+Type:Frequent
+
+------------Final Report by Strategy-2----------------
+Normal Passenger Queue:
+Type	Name	Waiting Time
+Normal	a	1
+Normal	b	3
+Normal	c	5
+Normal	d	7
+Frequent Passenger Queue:
+Type		Name	Waiting Time
+Frequent	e	0
+Frequent	f	2
+Frequent	g	4
+Frequent	h	6
+Frequent	i	8
+
+------------------------------------------------------
+
+------------------------------------------------------
+Strategy 3:
+Removing  Passengers in Frequent Queue and Normal Queue according to ratio considering each passenger requires 1 min at the counter
+
+Ratio:1
+***At the Counter***
+Passenger 1:
+Name:e
+Type:Frequent
+***At the Counter***
+Passenger 1:
+Name:a
+Type:Normal
+***At the Counter***
+Passenger 2:
+Name:f
+Type:Frequent
+***At the Counter***
+Passenger 2:
+Name:b
+Type:Normal
+***At the Counter***
+Passenger 3:
+Name:g
+Type:Frequent
+***At the Counter***
+Passenger 3:
+Name:c
+Type:Normal
+***At the Counter***
+Passenger 4:
+Name:h
+Type:Frequent
+***At the Counter***
+Passenger 4:
+Name:d
+Type:Normal
+***At the Counter***
+Passenger 5:
+Name:i
+Type:Frequent
+
+------------Final Report by Strategy-3---------------
+Normal Passenger Queue:
+Type	Name	Waiting Time
+Normal	a	1
+Normal	b	3
+Normal	c	5
+Normal	d	7
+Frequent Passenger Queue:
+Type		Name	Waiting Time
+Frequent	e	0
+Frequent	f	2
+Frequent	g	4
+Frequent	h	6
+Frequent	i	8
+
+------------------------------------------------------
+
+--------------TOTAL EVALUATION----------------
+Strategy	T.Normal	T.Frequent	T.Time	Avg.Time
+
+1		8		4		12		6
+2		7		8		15		7
+3		7		8		15		7
+Startegies which can be used for best result:
+1
+
+Execute By:
+1.Strategy 1
+2.Strategy 2
+3.Strategy 3
+4.Evaluate
+5.Exit
+5
+Thankyou!amitabh@amitabh-Inspiron-7537:~/Desktop$ */

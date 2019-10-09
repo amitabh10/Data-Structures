@@ -1,0 +1,462 @@
+Write a program to implement Multiple queues that is two queues in a single array and perform operations like add queue delete queue and display queue
+
+
+#include<stdio.h>
+
+#define max 10
+
+int q[max];
+int rear1=-1;
+int rear2=10;
+int front1=0;
+int front2=9;
+int flag=0;
+void init()
+{
+	int i;
+	for(i=0;i<max;i++)
+	{
+		q[i]=0;
+	}
+}
+void addq(int x,int y)
+{
+	if(rear2-rear1==1)
+	{
+		if(y==1)
+		{
+			if(q[0]==0)
+			{
+				rear1=0;
+				q[rear1]=x;
+			}
+			else
+			{		
+				printf("The whole queue arrray is full");
+			}
+
+		}
+		else if(y==2)
+		{
+			
+			if(q[9]==0)
+			{
+				rear2=9;
+				q[rear2]=x;
+				
+			}
+			else
+			{		
+				printf("The whole queue arrray is full");
+			}
+
+		}
+		flag=1;
+	}
+	else if(y==1)
+	{
+		if(front1-rear1==1 && flag==1)
+		{
+			printf("\nQueue 1 is full!");
+		}
+		else
+		{
+			rear1=rear1+1;
+			q[rear1]=x;
+			
+		}									 
+			
+	}
+	else
+	{
+		if(rear2-front2==1 && flag==1)
+		{
+			printf("\nQueue 2 is full!");
+		}
+		else
+		{
+			rear2=rear2-1;
+			q[rear2]=x;
+		}
+	}										         					
+}
+
+int delq(int y)
+{
+	int x;
+	if(y==1)
+	{
+		if( (rear1==-1 && front1==0)|| (front1-rear1==1) )
+		{
+			printf("\nQueue 1 is empty");
+		}
+		else
+		{
+			x=q[front1];
+			q[front1]=0;
+			front1=front1+1;
+			printf("\nThe element deleted from queue %d is %d ",y,x);
+		}
+	}
+	else
+	{
+		if( (rear2==10 && front2==9)|| (rear2-front2==1) )
+		{
+			printf("\nQueue 2 is empty");
+		}
+		else
+		{
+			x=q[front2];
+			q[front2]=0;
+			front2=front2-1;
+			printf("\nThe element deleted from queue %d is %d ",y,x);
+
+		}
+	}
+}
+
+void display()
+{
+	int i;
+	
+	for(i=0;i<max;i++)
+	{
+		printf("\n%d",q[i]);		
+		if(i==rear1 && i==front1)
+		{
+			printf("\t <- rear1\t <- front1");
+		}
+		else if(i==rear1)
+		{
+			printf("\t <- rear1");
+		}
+		else if(i==rear2 && i==front2)
+		{
+			printf("\t <- rear2\t <- front2");
+		}
+		else if(i==rear2)
+		{
+			printf("\t<- rear2");
+		}
+		else if(i==front1)
+		{
+			printf("\t <- front1");
+		}
+		else if(i==front2)
+		{
+			printf("\t <- front2");
+		}
+		
+	}
+}
+
+
+void main()
+{
+	int num,y,choice,temp;
+	int number,size,i,j,qn;
+	init();
+	while(choice!=4)
+	{
+		printf("\n1.Add element in queue\n2.Delete element from queue\n3.Display queue\n4.Exit\n");
+		scanf("%d",&choice);
+		switch(choice)
+		{
+			case 1:printf("\nEnter the element u want to enter : ");	
+			       scanf("%d",&number);
+			       printf("\nEnter the queue number u want to enter : ");
+			       scanf("%d",&qn);
+			       addq(number,qn);
+			       break;
+			case 2:printf("\nEnter the queue number u want to delete from : ");
+			       scanf("%d",&qn);
+			       delq(qn);		       
+			       break;
+			case 3:display();
+			       break;
+			case 4:
+			       break;
+		}
+	}
+		
+}
+
+
+
+
+*********************************** O U T P U T **************************************
+
+
+
+cdomkar@omkar-HP-Pavilion-15-Notebook-PC:~$ cd omk
+omkar@omkar-HP-Pavilion-15-Notebook-PC:~/omk$ cd ds
+omkar@omkar-HP-Pavilion-15-Notebook-PC:~/omk/ds$ gcc d4.c
+omkar@omkar-HP-Pavilion-15-Notebook-PC:~/omk/ds$ ./a.out
+
+1.Add element in queue
+2.Delete element from queue
+3.Display queue
+4.Exit
+1
+
+Enter the element u want to enter : 11
+
+Enter the queue number u want to enter : 1
+
+1.Add element in queue
+2.Delete element from queue
+3.Display queue
+4.Exit
+1
+
+Enter the element u want to enter : 12
+
+Enter the queue number u want to enter : 1
+
+1.Add element in queue
+2.Delete element from queue
+3.Display queue
+4.Exit
+1
+
+Enter the element u want to enter : 13
+
+Enter the queue number u want to enter : 1
+
+1.Add element in queue
+2.Delete element from queue
+3.Display queue
+4.Exit
+1
+
+Enter the element u want to enter : 14
+
+Enter the queue number u want to enter : 1
+
+1.Add element in queue
+2.Delete element from queue
+3.Display queue
+4.Exit
+3
+
+11	 <- front1
+12
+13
+14	 <- rear1
+0
+0
+0
+0
+0
+0	 <- front2
+1.Add element in queue
+2.Delete element from queue
+3.Display queue
+4.Exit
+1
+
+Enter the element u want to enter : 15
+
+Enter the queue number u want to enter : 2
+
+1.Add element in queue
+2.Delete element from queue
+3.Display queue
+4.Exit
+1
+
+Enter the element u want to enter : 16
+
+Enter the queue number u want to enter : 2
+
+1.Add element in queue
+2.Delete element from queue
+3.Display queue
+4.Exit
+1
+
+Enter the element u want to enter : 17
+
+Enter the queue number u want to enter : 2
+
+1.Add element in queue
+2.Delete element from queue
+3.Display queue
+4.Exit
+1
+
+Enter the element u want to enter : 18
+
+Enter the queue number u want to enter : 2
+
+1.Add element in queue
+2.Delete element from queue
+3.Display queue
+4.Exit
+1
+
+Enter the element u want to enter : 19
+
+Enter the queue number u want to enter : 2
+
+1.Add element in queue
+2.Delete element from queue
+3.Display queue
+4.Exit
+3
+
+11	 <- front1
+12
+13
+14	 <- rear1
+0
+19	<- rear2
+18
+17
+16
+15	 <- front2
+1.Add element in queue
+2.Delete element from queue
+3.Display queue
+4.Exit
+1
+
+Enter the element u want to enter : 20
+
+Enter the queue number u want to enter : 2
+
+1.Add element in queue
+2.Delete element from queue
+3.Display queue
+4.Exit
+3
+
+11	 <- front1
+12
+13
+14	 <- rear1
+20	<- rear2
+19
+18
+17
+16
+15	 <- front2
+1.Add element in queue
+2.Delete element from queue
+3.Display queue
+4.Exit
+2
+
+Enter the queue number u want to delete from : 1
+
+The element deleted from queue 1 is 11 
+1.Add element in queue
+2.Delete element from queue
+3.Display queue
+4.Exit
+2
+
+Enter the queue number u want to delete from : 1
+
+The element deleted from queue 1 is 12 
+1.Add element in queue
+2.Delete element from queue
+3.Display queue
+4.Exit
+3
+
+0
+0
+13	 <- front1
+14	 <- rear1
+20	<- rear2
+19
+18
+17
+16
+15	 <- front2
+1.Add element in queue
+2.Delete element from queue
+3.Display queue
+4.Exit
+1
+
+Enter the element u want to enter : 21
+
+Enter the queue number u want to enter : 1
+
+1.Add element in queue
+2.Delete element from queue
+3.Display queue
+4.Exit
+3
+
+21	 <- rear1
+0
+13	 <- front1
+14
+20	<- rear2
+19
+18
+17
+16
+15	 <- front2
+1.Add element in queue
+2.Delete element from queue
+3.Display queue
+4.Exit
+1
+
+Enter the element u want to enter : 21
+
+Enter the queue number u want to enter : 1
+
+1.Add element in queue
+2.Delete element from queue
+3.Display queue
+4.Exit
+3
+
+21
+21	 <- rear1
+13	 <- front1
+14
+20	<- rear2
+19
+18
+17
+16
+15	 <- front2
+1.Add element in queue
+2.Delete element from queue
+3.Display queue
+4.Exit
+1
+
+Enter the element u want to enter : 23
+
+Enter the queue number u want to enter : 1
+
+Queue 1 is full!
+1.Add element in queue
+2.Delete element from queue
+3.Display queue
+4.Exit
+3
+
+21
+21	 <- rear1
+13	 <- front1
+14
+20	<- rear2
+19
+18
+17
+16
+15	 <- front2
+1.Add element in queue
+2.Delete element from queue
+3.Display queue
+4.Exit
+4
+omkar@omkar-HP-Pavilion-15-Notebook-PC:~/omk/ds$ 
